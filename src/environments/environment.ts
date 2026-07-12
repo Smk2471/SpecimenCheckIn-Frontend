@@ -2,5 +2,5 @@
 // proxy.conf.json, so apiBaseUrl is left empty (relative URLs).
 export const environment = {
   production: false,
-  apiBaseUrl: ''
+  apiBaseUrl: 'https://specimencheckin-backend-production.up.railway.app'
 };
