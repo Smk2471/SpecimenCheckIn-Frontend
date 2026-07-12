@@ -1,0 +1,36 @@
+<div class="overlay" (click)="cancel.emit()">
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" (click)="$event.stopPropagation()">
+    <h3 id="dialog-title">Record an off-manifest specimen</h3>
+    <p class="dialog-sub">This bottle arrived but wasn't on the original manifest. Recording it here raises an off-manifest discrepancy automatically.</p>
+
+    @if (validationError()) {
+      <div class="dialog-error">{{ validationError() }}</div>
+    }
+
+    <label class="field">
+      <span>Specimen code *</span>
+      <input type="text" [ngModel]="code()" (ngModelChange)="code.set($event)" placeholder="e.g. SPX-9999" autofocus />
+    </label>
+
+    <label class="field">
+      <span>Patient *</span>
+      <input type="text" [ngModel]="patient()" (ngModelChange)="patient.set($event)" placeholder="Patient name" />
+    </label>
+
+    <div class="field-row">
+      <label class="field">
+        <span>Site</span>
+        <input type="text" [ngModel]="site()" (ngModelChange)="site.set($event)" placeholder="Optional" />
+      </label>
+      <label class="field">
+        <span>Provider</span>
+        <input type="text" [ngModel]="provider()" (ngModelChange)="provider.set($event)" placeholder="Optional" />
+      </label>
+    </div>
+
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-ghost" (click)="cancel.emit()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="onSubmit()">Add specimen</button>
+    </div>
+  </div>
+</div>

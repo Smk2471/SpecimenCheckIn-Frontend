@@ -1,0 +1,52 @@
+<aside class="worklist">
+  <div class="worklist-header">
+    <h2>Manifest Worklist</h2>
+    <input
+      class="search"
+      type="search"
+      placeholder="Search by manifest or clinic..."
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)"
+      aria-label="Search manifests"
+    />
+  </div>
+
+  <div class="worklist-list">
+    @if (loading()) {
+      @for (i of [1,2,3,4]; track i) {
+        <div class="manifest-card skeleton">
+          <div class="skeleton-line skeleton-line-title"></div>
+          <div class="skeleton-line skeleton-line-sub"></div>
+        </div>
+      }
+    } @else if (filtered().length === 0) {
+      <div class="empty">
+        <p>No manifests match your search.</p>
+      </div>
+    } @else {
+      @for (m of filtered(); track m.id) {
+        <button
+          type="button"
+          class="manifest-card"
+          [class.manifest-card-active]="m.id === selectedId()"
+          (click)="select.emit(m.id)"
+        >
+          <div class="card-top">
+            <span class="clinic-name">{{ m.clinicName }}</span>
+            <app-status-pill [status]="m.status" />
+          </div>
+          <div class="card-mid">
+            <span class="manifest-code">{{ m.code }}</span>
+            <span class="sent-at">{{ formatTime(m.sentAt) }}</span>
+          </div>
+          <div class="card-bottom">
+            <span class="count-chip">{{ m.receivedCount }}/{{ m.specimenCount }} received</span>
+            @if (m.openDiscrepancyCount > 0) {
+              <span class="count-chip count-chip-warning">{{ m.openDiscrepancyCount }} discrepancy{{ m.openDiscrepancyCount === 1 ? '' : 'ies' }}</span>
+            }
+          </div>
+        </button>
+      }
+    }
+  </div>
+</aside>

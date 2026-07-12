@@ -1,0 +1,38 @@
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="brand">
+        <span class="brand-mark">IPI</span>
+        <span class="brand-name">IPI&nbsp;Pro</span>
+      </span>
+      <nav class="tabs" aria-label="Primary">
+        <span class="tab tab-active">Check-In</span>
+        <span class="tab tab-disabled" title="Not part of this assignment's scope">Scan History</span>
+        <span class="tab tab-disabled" title="Not part of this assignment's scope">Manifests</span>
+        <span class="tab tab-disabled" title="Not part of this assignment's scope">Discrepancies</span>
+      </nav>
+    </div>
+
+    <div class="topbar-right">
+      <label class="lab-switcher">
+        <span class="lab-switcher-label">Lab</span>
+        <select
+          [ngModel]="tenant.currentLabId()"
+          (ngModelChange)="onLabChange($event)"
+          aria-label="Switch current lab (tenant)"
+        >
+          @for (lab of tenant.labs; track lab.id) {
+            <option [value]="lab.id">{{ lab.name }}</option>
+          }
+        </select>
+      </label>
+      <div class="user-avatar" [title]="tenant.currentLabName()">
+        {{ tenant.currentLabName().charAt(0) }}
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <app-checkin-page />
+  </main>
+</div>

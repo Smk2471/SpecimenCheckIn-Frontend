@@ -1,0 +1,35 @@
+<div class="checkin-layout">
+  <app-manifest-worklist
+    [manifests]="manifests()"
+    [selectedId]="selectedManifestId()"
+    [loading]="listLoading()"
+    (select)="selectManifest($event)"
+  />
+
+  <section class="detail-pane">
+    @if (errorMessage()) {
+      <div class="error-banner" role="alert">
+        <span>{{ errorMessage() }}</span>
+        <button type="button" class="error-dismiss" (click)="dismissError()" aria-label="Dismiss error">×</button>
+      </div>
+    }
+
+    <app-manifest-detail
+      [manifest]="selectedManifest()"
+      [loading]="detailLoading()"
+      [actionInFlightId]="actionInFlightId()"
+      [closing]="closing()"
+      (receive)="onReceive($event)"
+      (flag)="onFlag($event)"
+      (addSpecimen)="showAddDialog.set(true)"
+      (close)="onClose()"
+    />
+  </section>
+</div>
+
+@if (showAddDialog()) {
+  <app-add-specimen-dialog
+    (submit)="onAddSpecimen($event)"
+    (cancel)="showAddDialog.set(false)"
+  />
+}

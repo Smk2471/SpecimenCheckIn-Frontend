@@ -1,0 +1,94 @@
+/* Design tokens sampled/derived from the Check-In screen design reference. */
+:root {
+  --navy-900: #1B3A52;
+  --navy-800: #20445E;
+  --navy-700: #2B5C83;
+  --navy-600: #35688F;
+
+  --bg-page: #F5F6F8;
+  --bg-surface: #FFFFFF;
+  --bg-surface-hover: #F0F3F6;
+  --border-subtle: #E2E8ED;
+  --border-strong: #C9D4DD;
+
+  --text-primary: #1F2937;
+  --text-secondary: #5B6B7A;
+  --text-muted: #8896A3;
+  --text-on-dark: #EAF1F6;
+  --text-on-dark-muted: #9FB3C4;
+
+  --status-open: #2B5C83;
+  --status-intransit: #8896A3;
+  --status-closed: #1D9A6C;
+  --status-closed-disc: #D97706;
+
+  --status-pending: #8896A3;
+  --status-received: #1D9A6C;
+  --status-flagged: #DC2626;
+  --status-added: #7C5CBF;
+
+  --danger: #DC2626;
+  --danger-bg: #FDECEC;
+  --success: #1D9A6C;
+  --success-bg: #E9F7F1;
+  --warning: #D97706;
+  --warning-bg: #FDF3E3;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 1px 2px rgba(27, 58, 82, 0.06), 0 1px 1px rgba(27, 58, 82, 0.04);
+  --shadow-raised: 0 4px 16px rgba(27, 58, 82, 0.12);
+
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+app-root {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Visible focus ring everywhere, including custom controls */
+:focus-visible {
+  outline: 2px solid var(--navy-600);
+  outline-offset: 2px;
+}

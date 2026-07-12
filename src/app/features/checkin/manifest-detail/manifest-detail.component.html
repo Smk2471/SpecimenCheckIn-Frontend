@@ -1,0 +1,128 @@
+@if (loading()) {
+  <div class="detail-loading">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Loading manifest…</p>
+  </div>
+} @else if (manifest(); as m) {
+  <div class="detail">
+    <header class="detail-header">
+      <div class="detail-heading">
+        <div class="detail-title-row">
+          <h1>{{ m.code }}</h1>
+          <app-status-pill [status]="m.status" />
+        </div>
+        <p class="detail-subtitle">{{ m.clinicName }} &middot; sent {{ formatTime(m.sentAt) }}</p>
+      </div>
+
+      <div class="detail-actions">
+        <button
+          type="button"
+          class="btn btn-ghost"
+          [disabled]="!isManifestOpen(m)"
+          (click)="addSpecimen.emit()"
+        >
+          + Off-manifest specimen
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="!m.readyToClose || closing()"
+          [title]="!m.readyToClose ? 'Every specimen must be received or flagged before you can close.' : ''"
+          (click)="close.emit()"
+        >
+          {{ closing() ? 'Closing…' : 'Close manifest' }}
+        </button>
+      </div>
+    </header>
+
+    <div class="counts-row">
+      <div class="count-stat">
+        <span class="count-value">{{ m.counts.total }}</span>
+        <span class="count-label">Total</span>
+      </div>
+      <div class="count-stat count-stat-received">
+        <span class="count-value">{{ m.counts.received }}</span>
+        <span class="count-label">Received</span>
+      </div>
+      <div class="count-stat count-stat-pending">
+        <span class="count-value">{{ m.counts.pending }}</span>
+        <span class="count-label">Pending</span>
+      </div>
+      <div class="count-stat count-stat-flagged">
+        <span class="count-value">{{ m.counts.flagged }}</span>
+        <span class="count-label">Flagged</span>
+      </div>
+      <div class="count-stat count-stat-added">
+        <span class="count-value">{{ m.counts.added }}</span>
+        <span class="count-label">Off-Manifest</span>
+      </div>
+      <div class="count-stat count-stat-discrepancy">
+        <span class="count-value">{{ m.counts.openDiscrepancies }}</span>
+        <span class="count-label">Open discrepancies</span>
+      </div>
+    </div>
+
+    @if (!m.readyToClose && isManifestOpen(m)) {
+      <div class="reconcile-banner">
+        {{ m.counts.pending }} specimen{{ m.counts.pending === 1 ? '' : 's' }} still pending —
+        receive or flag every specimen before this manifest can be closed.
+      </div>
+    }
+
+    <div class="table-wrap">
+      <table class="specimen-table">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Patient</th>
+            <th>Site</th>
+            <th>Provider</th>
+            <th>Status</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of m.specimens; track s.id) {
+            <tr [class.row-busy]="isRowBusy(s.id)">
+              <td class="mono">{{ s.code }}</td>
+              <td>{{ s.patient }}</td>
+              <td>{{ s.site || '—' }}</td>
+              <td>{{ s.provider || '—' }}</td>
+              <td><app-status-pill [status]="s.status" /></td>
+              <td class="actions-col">
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-success"
+                    [disabled]="!canReceive(s) || !isManifestOpen(m) || isRowBusy(s.id)"
+                    (click)="receive.emit(s.id)"
+                  >
+                    {{ isRowBusy(s.id) ? '…' : 'Receive' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger-outline"
+                    [disabled]="!canFlag(s) || !isManifestOpen(m) || isRowBusy(s.id)"
+                    (click)="flag.emit(s.id)"
+                  >
+                    Flag missing
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="table-empty">No specimens on this manifest yet.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+} @else {
+  <div class="detail-empty">
+    <div class="detail-empty-icon" aria-hidden="true">📋</div>
+    <h3>Select a manifest to begin</h3>
+    <p>Choose a manifest from the worklist to review and check in its specimens.</p>
+  </div>
+}
