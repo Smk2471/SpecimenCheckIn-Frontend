@@ -24,33 +24,50 @@ export class CheckinPageComponent {
   selectedManifest = signal<ManifestDetail | null>(null);
   detailLoading = signal(false);
 
-  actionInFlightId = signal<string | null>(null); // specimen id currently mid-receive/flag
+  actionInFlightId = signal<string | null>(null);
   closing = signal(false);
   showAddDialog = signal(false);
 
   errorMessage = signal<string | null>(null);
 
-  constructor() {
-    this.loadManifests();
+  // Bumped on every lab switch. Any list-fetch response whose captured
+  // sequence number doesn't match the *current* one when it resolves is
+  // stale (it was in flight for a lab the user has since switched away
+  // from) and is discarded instead of overwriting the UI.
+  private listRequestSeq = 0;
 
-    // Re-load everything from scratch whenever the technician switches labs
-    // in the dev-mode lab switcher (a real login would just be a fresh page load).
+  // Bumped on every manifest selection (and on lab switch, since the
+  // selection is cleared then too). Same purpose, for detail fetches.
+  private detailRequestSeq = 0;
+
+  constructor() {
+    // The effect's first run fires once automatically on creation, so this
+    // single effect - not a separate explicit call - is both the initial
+    // load AND the "lab changed" handler. Only one code path, so there's
+    // no way for it to double-fire and race itself on startup.
     effect(() => {
-      this.tenant.currentLabId(); // dependency
+      this.tenant.currentLabId(); // dependency: reruns whenever the lab changes
       this.selectedManifestId.set(null);
       this.selectedManifest.set(null);
+      this.actionInFlightId.set(null);
+      this.closing.set(false);
+      this.showAddDialog.set(false);
+      this.errorMessage.set(null);
       this.loadManifests();
     });
   }
 
   loadManifests(): void {
+    const seq = ++this.listRequestSeq;
     this.listLoading.set(true);
     this.api.listManifests().subscribe({
       next: manifests => {
+        if (seq !== this.listRequestSeq) return; // a newer request has since started; drop this one
         this.manifests.set(manifests);
         this.listLoading.set(false);
       },
       error: err => {
+        if (seq !== this.listRequestSeq) return;
         this.listLoading.set(false);
         this.showError(err.message);
       }
@@ -58,22 +75,29 @@ export class CheckinPageComponent {
   }
 
   private refreshManifestsQuietly(): void {
+    const seq = ++this.listRequestSeq;
     this.api.listManifests().subscribe({
-      next: manifests => this.manifests.set(manifests),
-      error: () => {} // non-critical background refresh; the detail panel already has the latest state
+      next: manifests => {
+        if (seq !== this.listRequestSeq) return;
+        this.manifests.set(manifests);
+      },
+      error: () => {} // non-critical background refresh
     });
   }
 
   selectManifest(id: string): void {
+    const seq = ++this.detailRequestSeq;
     this.selectedManifestId.set(id);
     this.detailLoading.set(true);
     this.errorMessage.set(null);
     this.api.getManifest(id).subscribe({
       next: detail => {
+        if (seq !== this.detailRequestSeq) return; // user has since switched labs or picked another manifest
         this.selectedManifest.set(detail);
         this.detailLoading.set(false);
       },
       error: err => {
+        if (seq !== this.detailRequestSeq) return;
         this.detailLoading.set(false);
         this.selectedManifest.set(null);
         this.showError(err.message);
