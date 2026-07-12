@@ -4,10 +4,6 @@ import { Subject } from 'rxjs';
 
 const STORAGE_KEY = 'specimen-checkin.currentLabId';
 
-private readonly labChangedSubject = new Subject<string>();
-
-readonly labChanged$ = this.labChangedSubject.asObservable();
-
 // Stands in for real auth/session (out of scope per the assignment brief).
 // Holds which seeded lab the technician is "logged in" as, persisted to
 // localStorage only so a page refresh doesn't lose your place - this is a
@@ -16,6 +12,9 @@ readonly labChanged$ = this.labChangedSubject.asObservable();
 @Injectable({ providedIn: 'root' })
 export class TenantService {
   readonly labs = SEEDED_LABS;
+  private readonly labChangedSubject = new Subject<string>();
+
+  readonly labChanged$ = this.labChangedSubject.asObservable();
 
   readonly currentLabId = signal<string>(this.readInitialLabId());
 
