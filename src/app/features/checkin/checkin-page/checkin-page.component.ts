@@ -39,38 +39,31 @@ export class CheckinPageComponent {
   errorMessage = signal<string | null>(null);
 
   constructor() {
-    // Initial load
-    this.loadManifests();
-
-    // Reload everything whenever the selected lab changes.
-   effect(() => {
-
+  effect((onCleanup) => {
     const labId = this.tenant.currentLabId();
 
-    console.log("Lab changed:", labId);
-
     this.manifests.set([]);
-
     this.selectedManifestId.set(null);
-
     this.selectedManifest.set(null);
 
-    this.detailLoading.set(false);
-
     this.listLoading.set(true);
-
-    this.actionInFlightId.set(null);
-
-    this.closing.set(false);
-
-    this.showAddDialog.set(false);
-
+    this.detailLoading.set(false);
     this.errorMessage.set(null);
 
-    this.loadManifests();
+    const sub = this.api.listManifests().subscribe({
+      next: manifests => {
+        this.manifests.set(manifests);
+        this.listLoading.set(false);
+      },
+      error: err => {
+        this.listLoading.set(false);
+        this.showError(err.message);
+      }
+    });
 
-});
-  }
+    onCleanup(() => sub.unsubscribe());
+  });
+}
 
   loadManifests(): void {
 
