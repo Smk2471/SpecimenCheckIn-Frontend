@@ -39,30 +39,25 @@ export class CheckinPageComponent {
   errorMessage = signal<string | null>(null);
 
   constructor() {
-  effect((onCleanup) => {
-    const labId = this.tenant.currentLabId();
 
-    this.manifests.set([]);
-    this.selectedManifestId.set(null);
-    this.selectedManifest.set(null);
+    this.loadManifests();
 
-    this.listLoading.set(true);
-    this.detailLoading.set(false);
-    this.errorMessage.set(null);
+    this.tenant.labChanged$.subscribe(() => {
 
-    const sub = this.api.listManifests().subscribe({
-      next: manifests => {
-        this.manifests.set(manifests);
-        this.listLoading.set(false);
-      },
-      error: err => {
-        this.listLoading.set(false);
-        this.showError(err.message);
-      }
+        this.manifests.set([]);
+
+        this.selectedManifestId.set(null);
+
+        this.selectedManifest.set(null);
+
+        this.detailLoading.set(false);
+
+        this.errorMessage.set(null);
+
+        this.loadManifests();
+
     });
 
-    onCleanup(() => sub.unsubscribe());
-  });
 }
 
   loadManifests(): void {
