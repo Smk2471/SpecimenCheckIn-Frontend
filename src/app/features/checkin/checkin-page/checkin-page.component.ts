@@ -43,37 +43,70 @@ export class CheckinPageComponent {
     this.loadManifests();
 
     // Reload everything whenever the selected lab changes.
-    effect(() => {
-      this.tenant.currentLabId();
+   effect(() => {
 
-      // Reset page state
-      this.selectedManifestId.set(null);
-      this.selectedManifest.set(null);
+    const labId = this.tenant.currentLabId();
 
-      this.detailLoading.set(false);
-      this.actionInFlightId.set(null);
-      this.closing.set(false);
-      this.showAddDialog.set(false);
-      this.errorMessage.set(null);
+    console.log("Lab changed:", labId);
 
-      this.loadManifests();
-    });
+    this.manifests.set([]);
+
+    this.selectedManifestId.set(null);
+
+    this.selectedManifest.set(null);
+
+    this.detailLoading.set(false);
+
+    this.listLoading.set(true);
+
+    this.actionInFlightId.set(null);
+
+    this.closing.set(false);
+
+    this.showAddDialog.set(false);
+
+    this.errorMessage.set(null);
+
+    this.loadManifests();
+
+});
   }
 
   loadManifests(): void {
+
+    this.manifests.set([]);
+
+    this.selectedManifestId.set(null);
+
+    this.selectedManifest.set(null);
+
+    this.detailLoading.set(false);
+
     this.listLoading.set(true);
 
     this.api.listManifests().subscribe({
-      next: manifests => {
-        this.manifests.set(manifests);
-        this.listLoading.set(false);
-      },
-      error: err => {
-        this.listLoading.set(false);
-        this.showError(err.message);
-      }
+        next: manifests => {
+
+           this.manifests.set(manifests);
+
+            this.listLoading.set(false);
+        },
+
+        error: err => {
+
+            this.manifests.set([]);
+
+            this.selectedManifest.set(null);
+
+            this.selectedManifestId.set(null);
+
+            this.listLoading.set(false);
+
+            this.showError(err.message);
+        }
     });
-  }
+
+}
 
   private refreshManifestsQuietly(): void {
     this.api.listManifests().subscribe({
@@ -106,15 +139,17 @@ export class CheckinPageComponent {
     this.errorMessage.set(null);
 
     this.api.getManifest(id).subscribe({
-      next: detail => {
-        // Ignore stale responses if user already selected another manifest.
-        if (this.selectedManifestId() !== id) {
-          return;
-        }
+     next: detail => {
 
-        this.selectedManifest.set(detail);
-        this.detailLoading.set(false);
-      },
+    if (this.selectedManifestId() !== id) {
+        return;
+    }
+
+    this.selectedManifest.set(detail);
+
+    this.detailLoading.set(false);
+
+},
       error: err => {
         if (this.selectedManifestId() !== id) {
           return;
