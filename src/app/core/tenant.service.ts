@@ -1,7 +1,12 @@
 import { Injectable, signal } from '@angular/core';
 import { SEEDED_LABS } from './models';
+import { Subject } from 'rxjs';
 
 const STORAGE_KEY = 'specimen-checkin.currentLabId';
+
+private readonly labChangedSubject = new Subject<string>();
+
+readonly labChanged$ = this.labChangedSubject.asObservable();
 
 // Stands in for real auth/session (out of scope per the assignment brief).
 // Holds which seeded lab the technician is "logged in" as, persisted to
@@ -17,7 +22,9 @@ export class TenantService {
   setLab(labId: string): void {
     this.currentLabId.set(labId);
     localStorage.setItem(STORAGE_KEY, labId);
-  }
+
+    this.labChangedSubject.next(labId);
+}
 
   currentLabName(): string {
     return this.labs.find(l => l.id === this.currentLabId())?.name ?? 'Unknown lab';
