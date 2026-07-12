@@ -3,7 +3,8 @@
     <div class="spinner" aria-hidden="true"></div>
     <p>Loading manifest…</p>
   </div>
-} @else if (manifest(); as m) {
+} @else {
+  @if (manifest(); as m) {
   <div class="detail">
     <header class="detail-header">
       <div class="detail-heading">
@@ -119,10 +120,11 @@
       </table>
     </div>
   </div>
-} @else {
-  <div class="detail-empty">
-    <div class="detail-empty-icon" aria-hidden="true">📋</div>
-    <h3>Select a manifest to begin</h3>
-    <p>Choose a manifest from the worklist to review and check in its specimens.</p>
-  </div>
+  } @else {
+    <div class="detail-empty">
+      <div class="detail-empty-icon" aria-hidden="true">📋</div>
+      <h3>Select a manifest to begin</h3>
+      <p>Choose a manifest from the worklist to review and check in its specimens.</p>
+    </div>
+  }
 }
